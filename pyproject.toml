@@ -1,0 +1,57 @@
+[project]
+name = "rf-detr-training-pipeline"
+dynamic = ["version"]
+description = "A modular fine-tuning pipeline for RF-DETR (Real-time DEtection TRansformer) models"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Borda", email = "6035284+Borda@users.noreply.github.com"},
+]
+keywords = ["deep-learning", "object-detection", "transformer", "rf-detr", "fine-tuning", "training-pipeline"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.urls]
+Homepage = "https://github.com/Borda/rf-detr-training-pipeline"
+Repository = "https://github.com/Borda/rf-detr-training-pipeline"
+Issues = "https://github.com/Borda/rf-detr-training-pipeline/issues"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "rf_detr_finetuning.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "F",   # Pyflakes
+    "W",   # pycodestyle warnings
+    "I",   # isort
+    "UP",  # pyupgrade
+    "D",   # pydocstyle
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D"]  # Exclude pydocstyle for tests
+"**/test_*.py" = ["D"]  # Exclude pydocstyle for test files
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
