@@ -24,15 +24,19 @@ rf-detr-training-pipeline/
 ## Modules
 
 ### src/data
+
 Contains data loading, preprocessing, and augmentation logic for RF-DETR training.
 
 ### src/training
+
 Implements training loops, optimizer configuration, and learning rate scheduling.
 
 ### src/evaluation
+
 Provides evaluation metrics and validation logic for model assessment.
 
 ### src/utils
+
 Contains utility functions for logging, configuration management, and visualization.
 
 ## Getting Started
