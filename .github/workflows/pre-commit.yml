@@ -1,3 +1,7 @@
+# TODO: Remove this workflow once the repository is public and pre-commit.ci bot is enabled
+# Pre-commit.ci will handle pre-commit checks and auto-fixes on PRs automatically
+# This workflow is only needed while the repository is private
+
 name: Pre-commit
 
 on:
