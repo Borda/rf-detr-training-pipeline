@@ -29,6 +29,8 @@ dependencies = [
 [project.optional-dependencies]
 cli = [
   "jsonargparse",
+    "tqdm",
+    "rich",
 ]
 data = [
   "kagglehub",
