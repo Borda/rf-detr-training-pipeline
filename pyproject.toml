@@ -35,6 +35,9 @@ cli = [
 data = [
   "kagglehub",
 ]
+dev = [
+  "pytest",
+]
 
 [project.urls]
 Homepage = "https://github.com/Borda/rf-detr-training-pipeline"
