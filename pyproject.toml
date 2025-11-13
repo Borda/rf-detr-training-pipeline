@@ -23,7 +23,15 @@ classifiers = [
 dependencies = [
   "rfdetr",
   "supervision",
-"opencv-python",
+  "opencv-python",
+]
+
+[project.optional-dependencies]
+cli = [
+  "jsonargparse",
+]
+data = [
+  "kagglehub",
 ]
 
 [project.urls]
