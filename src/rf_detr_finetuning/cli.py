@@ -6,10 +6,12 @@ from pathlib import Path
 from typing import Literal
 
 import matplotlib.pyplot as plt
+import supervision as sv
 import yaml
 
 from rf_detr_finetuning.data import convert_yolo_to_coco
 from rf_detr_finetuning.finetune import MAP_MODEL_SIZE, finetune_model
+from rf_detr_finetuning.predict import prediction
 
 
 def download_kaggle_dataset(name: str, dest: str = "data", force: bool = False) -> str:
@@ -63,6 +65,34 @@ def train(config_file: str, dataset: str, model_size: Literal[tuple(MAP_MODEL_SI
         logging.warning("GUI not available, skipping plot display.")
 
 
+def predict(
+    image_path: str,
+    model_size: Literal[tuple(MAP_MODEL_SIZE.keys())] = "small",
+    model_path: str | None = None,
+    confidence: float = 0.5,
+    class_names: dict[int, str] = None,
+) -> None:
+    """Predict on an image using a pretrained or checkpoint RF-DETR model and display the result.
+
+    Args:
+        image_path: Path to the input image.
+        model_size: Size of the RF-DETR model to use.
+        model_path: Path to the model checkpoint or pretrained model name.
+        confidence: Confidence threshold for predictions.
+        class_names: Optional mapping from class id to class name.
+    """
+    visual = prediction(
+        image_path=image_path,
+        model_size=model_size,
+        model_path=model_path,
+        confidence=confidence,
+        class_names=class_names,
+    )
+
+    # Display the annotated image
+    sv.plot_image(visual)
+
+
 commands = {
     "download": {
         "kaggle-dataset": download_kaggle_dataset,
@@ -71,4 +101,5 @@ commands = {
         "yolo-to-coco": convert_yolo_to_coco,
     },
     "train": train,
+    "predict": predict,
 }

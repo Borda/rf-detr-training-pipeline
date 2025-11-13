@@ -46,5 +46,8 @@ python -m rf_detr_finetuning convert yolo-to-coco --input_dir path/to/yolo/datas
    python -m rf_detr_finetuning train --dataset data/cctv-weapon-dataset_coco --config_file config/weapon_detection.yaml
    ```
 4. Evaluate the model on test footage.
+   ```bash
+   python -m rf_detr_finetuning predict --model_path output/checkpoint_best_total.pth --image_path data/simuletic/cctv-weapon-dataset/Dataset/images/Scene1_2.png
+   ```
 
 See the main README for module details and configuration options.
