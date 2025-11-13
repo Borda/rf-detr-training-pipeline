@@ -5,6 +5,9 @@ import shutil
 from pathlib import Path
 from typing import Literal
 
+import matplotlib.pyplot as plt
+import yaml
+
 from rf_detr_finetuning.data import convert_yolo_to_coco
 from rf_detr_finetuning.finetune import MAP_MODEL_SIZE, finetune_model
 
@@ -42,12 +45,22 @@ def train(config_file: str, dataset: str, model_size: Literal[tuple(MAP_MODEL_SI
         dataset: Path to the prepared dataset directory.
         model_size: Size of the RF-DETR model to use.
     """
-    import yaml
-
     with open(config_file) as f:
         cfg = yaml.safe_load(f)
 
     finetune_model(model_size=model_size, dataset_path=dataset, config=cfg)
+
+    # After training, try to display the metrics plot if it exists and GUI is available
+    metrics_plot = Path("output/metrics_plot.png")
+    if not metrics_plot.exists():
+        return
+    img = plt.imread(str(metrics_plot))
+    plt.imshow(img)
+    plt.title("Training Metrics")
+    try:
+        plt.show()
+    except Exception:
+        logging.warning("GUI not available, skipping plot display.")
 
 
 commands = {
