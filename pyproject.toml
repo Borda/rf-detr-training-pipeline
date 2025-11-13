@@ -23,17 +23,17 @@ classifiers = [
 dependencies = [
   "rfdetr",
   "supervision",
-  "opencv-python",
 ]
 
 [project.optional-dependencies]
 cli = [
   "jsonargparse",
-    "tqdm",
-    "rich",
 ]
 data = [
   "kagglehub",
+]
+dev = [
+  "pytest",
 ]
 
 [project.urls]
@@ -71,3 +71,8 @@ select = [
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.pytest.ini_options]
+color = "yes"
+testpaths = ["tests"]
+addopts = "-v --tb=short"

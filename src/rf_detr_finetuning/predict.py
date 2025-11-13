@@ -3,7 +3,6 @@
 import logging
 from pathlib import Path
 
-import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import supervision as sv
@@ -50,7 +49,7 @@ def prediction(
 
     # Load the image
     image = plt.imread(image_path)[..., :3]
-    annotated_image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    annotated_image = image[:, :, ::-1]
     annotated_image = sv.BoxAnnotator().annotate(annotated_image, predictions)
     annotated_image = sv.LabelAnnotator(text_color=Color.RED).annotate(annotated_image, predictions, labels=labels)
 

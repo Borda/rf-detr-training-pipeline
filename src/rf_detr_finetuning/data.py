@@ -16,7 +16,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
-import cv2
+from matplotlib import pyplot as plt
 
 
 def parse_yolo_annotations(
@@ -152,7 +152,7 @@ def create_coco_split(
     for image_path, label_path in file_list:
         image_path = Path(image_path)
         # Read image to get dimensions
-        image = cv2.imread(str(image_path))
+        image = plt.imread(str(image_path))
         if image is None:
             logging.warning(f"Could not read image {image_path} for COCO conversion.")
             continue
