@@ -4,8 +4,10 @@ import logging
 import random
 import shutil
 from pathlib import Path
+from typing import Literal
 
 from rf_detr_finetuning.data import create_coco_split
+from rf_detr_finetuning.finetune import MAP_MODEL_SIZE, finetune_model
 
 
 def download_kaggle_dataset(name: str, dest: str = "data", force: bool = False) -> str:
@@ -94,6 +96,22 @@ def convert_yolo_to_coco(
     return str(output_path)
 
 
+def train(config_file: str, dataset: str, model_size: Literal[tuple(MAP_MODEL_SIZE.keys())] = "small") -> None:
+    """Train the RF-DETR model using the provided YAML config and dataset path.
+
+    Args:
+        config_file: Path to the YAML training configuration file.
+        dataset: Path to the prepared dataset directory.
+        model_size: Size of the RF-DETR model to use.
+    """
+    import yaml
+
+    with open(config_file) as f:
+        cfg = yaml.safe_load(f)
+
+    finetune_model(model_size=model_size, dataset_path=dataset, config=cfg)
+
+
 commands = {
     "download": {
         "kaggle-dataset": download_kaggle_dataset,
@@ -101,4 +119,5 @@ commands = {
     "convert": {
         "yolo-to-coco": convert_yolo_to_coco,
     },
+    "train": train,
 }

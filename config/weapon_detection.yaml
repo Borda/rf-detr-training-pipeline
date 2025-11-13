@@ -1,0 +1,16 @@
+epochs: 5  # Number of training epochs
+batch_size: 4  # Batch size (adjust based on GPU memory)
+imgsz: 640  # Input image size
+#dataset_dir: str(prepared_dataset_dir)  # Path to your dataset directory
+#device: "cuda" if torch.cuda.is_available() else "cpu"  # Training device
+workers: 2  # Number of workers for data loading
+project: "rfdetr_training"  # Project name for saving results
+name: "weapon_detection_run"  # Run name
+amp: false  # Disable Automatic Mixed Precision
+# Keeping optimizer and learning rate-related parameters as they were explicitly set
+optimizer: "AdamW"
+lr: 0.0001
+weight_decay: 0.0001
+lr_scheduler_name: "StepLR"
+step_size: 20
+gamma: 0.1
