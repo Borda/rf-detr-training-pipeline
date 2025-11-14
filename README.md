@@ -1,4 +1,4 @@
-# RF-DETR Training Pipeline
+# Fine-tuning RF-DETR Pipeline
 
 A modular fine-tuning pipeline for [RF-DETR](https://github.com/roboflow/rf-detr) (Real-time DEtection TRansformer) models.
 
