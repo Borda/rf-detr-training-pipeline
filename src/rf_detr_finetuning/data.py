@@ -126,7 +126,7 @@ def _create_temp_data_yaml(class_names: dict[int, str]) -> tuple[Path, tempfile.
     """Create a temporary data.yaml file from class_names dict for supervision package."""
     temp_yaml_context = tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False)
     # Convert dict[int, str] to list format expected by supervision
-    max_class_id = max(class_names.keys())
+    max_class_id = max(class_names.keys()) if class_names else 0
     names_list = [class_names.get(i, f"class_{i}") for i in range(max_class_id + 1)]
     yaml_data = {"nc": len(names_list), "names": names_list}
     yaml.dump(yaml_data, temp_yaml_context)
