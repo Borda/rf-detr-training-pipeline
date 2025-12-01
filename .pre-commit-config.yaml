@@ -13,7 +13,7 @@ exclude: \.ipynb$  # todo: enable for notebooks later, when bot understands LFS
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: end-of-file-fixer
       - id: trailing-whitespace
@@ -42,14 +42,14 @@ repos:
         args: ["--in-place"]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.7.4
+    rev: v0.14.7
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
 
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.19
+    rev: 1.0.0
     hooks:
       - id: mdformat
         additional_dependencies:
@@ -59,7 +59,7 @@ repos:
         args: ["--number"]
 
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.6.0
+    rev: v2.11.1
     hooks:
       - id: pyproject-fmt
         additional_dependencies: [tox]
