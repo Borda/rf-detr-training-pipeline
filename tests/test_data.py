@@ -12,6 +12,31 @@ from PIL import Image
 from rf_detr_finetuning.data import convert_yolo_to_coco, parse_yolo_annotations
 
 
+def _create_synthetic_dataset(input_dir: Path, num_images: int, class_generator=None, bbox_generator=None):
+    """Create a synthetic dataset with images and labels for testing."""
+    images_dir = input_dir / "images"
+    labels_dir = input_dir / "labels"
+    images_dir.mkdir(parents=True, exist_ok=True)
+    labels_dir.mkdir(parents=True, exist_ok=True)
+
+    if class_generator is None:
+        class_generator = lambda i: 0
+    if bbox_generator is None:
+        bbox_generator = lambda i: "0.5 0.5 0.2 0.2"
+
+    for i in range(num_images):
+        # Create a simple test image
+        img = Image.fromarray(np.zeros((100, 100, 3), dtype=np.uint8))
+        img.save(images_dir / f"img_{i}.jpg")
+
+        # Create a label file with a single annotation
+        label_path = labels_dir / f"img_{i}.txt"
+        class_id = class_generator(i)
+        bbox = bbox_generator(i)
+        with open(label_path, "w", encoding="utf_8") as f:
+            f.write(f"{class_id} {bbox}\n")
+
+
 def test_parse_yolo_annotations():
     """Test parsing of YOLO annotations."""
     # Create a temporary label file
@@ -49,22 +74,7 @@ def test_convert_yolo_to_coco(split_ratios, expected_splits, tmpdir):
     output_dir = Path(tmpdir) / "output"
 
     # Create input directory structure
-    images_dir = input_dir / "images"
-    labels_dir = input_dir / "labels"
-    images_dir.mkdir(parents=True)
-    labels_dir.mkdir(parents=True)
-
-    # Create test images and labels
-    num_images = 10
-    for i in range(num_images):
-        # Create a simple test image
-        img = Image.fromarray(np.zeros((100, 100, 3), dtype=np.uint8))
-        img.save(images_dir / f"img_{i}.jpg")
-
-        # Create a label file with a single annotation
-        label_path = labels_dir / f"img_{i}.txt"
-        with open(label_path, "w", encoding="utf_8") as f:
-            f.write("0 0.5 0.5 0.2 0.2\n")
+    _create_synthetic_dataset(input_dir, num_images=10)
 
     # Define class names
     class_names = {0: "object"}
@@ -106,7 +116,7 @@ def test_convert_yolo_to_coco(split_ratios, expected_splits, tmpdir):
             assert not split_dir.exists(), f"Unexpected split '{split}' directory should not exist"
 
     # All images should be distributed across expected splits
-    assert total_images == num_images
+    assert total_images == 10
 
 
 def test_convert_yolo_to_coco_with_data_yaml(tmpdir):
@@ -114,25 +124,14 @@ def test_convert_yolo_to_coco_with_data_yaml(tmpdir):
     input_dir = Path(tmpdir) / "input"
     output_dir = Path(tmpdir) / "output"
 
-    # Create input directory structure
-    images_dir = input_dir / "images"
-    labels_dir = input_dir / "labels"
-    images_dir.mkdir(parents=True)
-    labels_dir.mkdir(parents=True)
-
+    # Create synthetic dataset with multiple classes and custom bbox
+    _create_synthetic_dataset(
+        input_dir, num_images=5, class_generator=lambda i: i % 2, bbox_generator=lambda i: "0.5 0.5 0.3 0.3"
+    )
     # Create data.yaml file
     data_yaml = {"nc": 2, "names": ["cat", "dog"]}
     with open(input_dir / "data.yaml", "w") as f:
         yaml.dump(data_yaml, f)
-
-    # Create test images and labels
-    for i in range(5):
-        img = Image.fromarray(np.zeros((100, 100, 3), dtype=np.uint8))
-        img.save(images_dir / f"img_{i}.jpg")
-
-        label_path = labels_dir / f"img_{i}.txt"
-        with open(label_path, "w", encoding="utf_8") as f:
-            f.write(f"{i % 2} 0.5 0.5 0.3 0.3\n")
 
     # Run conversion without class_names (should use data.yaml)
     result = convert_yolo_to_coco(

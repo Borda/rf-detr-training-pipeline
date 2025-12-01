@@ -65,7 +65,7 @@ lint.select = [
   "W",  # pycodestyle warnings
 ]
 lint.per-file-ignores."**/test_*.py" = [ "D" ] # Exclude pydocstyle for test files
-lint.per-file-ignores."tests/**" = [ "D" ] # Exclude pydocstyle for tests
+lint.per-file-ignores."tests/**" = [ "D", "E731" ] # Exclude pydocstyle for tests
 lint.pydocstyle.convention = "google"
 
 [tool.codespell]
