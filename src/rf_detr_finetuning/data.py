@@ -12,94 +12,10 @@ import logging
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any
 
 import supervision as sv
 import yaml
 from PIL import Image
-
-
-def parse_yolo_annotations(
-    label_path: str | Path, image_width: int, image_height: int, annotation_id_counter: int
-) -> tuple[list[dict[str, Any]], int]:
-    """Convert a YOLO-format label file into COCO-style annotation dicts.
-
-    Each non-empty, non-comment line in the label file is expected to be:
-        "<class> <cx> <cy> <w> <h>"
-    where coordinates are normalized to [0,1]. Lines that are blank, start with '#',
-    or don't have five tokens are skipped with a warning. Coordinates are converted
-    to absolute COCO bbox format [x_top_left, y_top_left, width, height]. Annotation
-    ids are assigned starting from annotation_id_counter and the counter is advanced.
-
-    Args:
-        label_path: path to the YOLO label file.
-        image_width: pixel width of the corresponding image.
-        image_height: pixel height of the corresponding image.
-        annotation_id_counter: starting value for assigning annotation ids.
-
-    Returns:
-        A tuple (annotations, new_counter) where annotations is a list of COCO-style
-        dicts (image_id left as None) and new_counter is the updated annotation id counter.
-
-    """
-    coco_annotations: list[dict[str, Any]] = []
-    label_path = Path(label_path)
-    try:
-        with label_path.open("r") as f:
-            lines = f.read().splitlines()
-    except FileNotFoundError:
-        logging.warning(f"Annotation file not found for {label_path}. Skipping.")
-        return [], annotation_id_counter
-
-    for line in lines:
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue  # skip empty/comment lines
-
-        parts = line.split()
-        if len(parts) != 5:
-            logging.warning(f"Skipping invalid line in {label_path}: {line}")
-            continue
-
-        try:
-            class_id = int(parts[0])
-            center_x_norm, center_y_norm, bbox_width_norm, bbox_height_norm = map(float, parts[1:])
-        except ValueError:
-            logging.warning(f"Could not parse numbers in {label_path}: {line}")
-            continue
-
-        # Convert normalized YOLO to absolute COCO format (x_top_left, y_top_left, width, height)
-        x_center = center_x_norm * image_width
-        y_center = center_y_norm * image_height
-        width_abs = bbox_width_norm * image_width
-        height_abs = bbox_height_norm * image_height
-
-        x_top_left = x_center - (width_abs / 2)
-        y_top_left = y_center - (height_abs / 2)
-
-        # Clamp bbox to image bounds and ensure non-negative dimensions to avoid invalid COCO annotations
-        x_top_left = max(0.0, x_top_left)
-        y_top_left = max(0.0, y_top_left)
-        width_abs = max(0.0, min(image_width - x_top_left, width_abs))
-        height_abs = max(0.0, min(image_height - y_top_left, height_abs))
-
-        # Only add annotation if bbox dimensions are positive
-        if width_abs > 0.0 and height_abs > 0.0:
-            annotation_id_counter += 1
-            coco_annotations.append(
-                {
-                    "id": annotation_id_counter,
-                    "image_id": None,  # set to None here; filled later when image_id is known
-                    "category_id": class_id,
-                    "bbox": [x_top_left, y_top_left, width_abs, height_abs],
-                    "area": width_abs * height_abs,
-                    "iscrowd": 0,
-                }
-            )
-        else:
-            logging.warning(f"Skipping invalid bounding box with non-positive dimensions in {label_path}: {line}")
-
-    return coco_annotations, annotation_id_counter
 
 
 def _export_dataset_split(dataset: sv.DetectionDataset, output_dir: Path, split_name: str) -> None:
@@ -123,7 +39,15 @@ def _export_dataset_split(dataset: sv.DetectionDataset, output_dir: Path, split_
 
 
 def _create_temp_data_yaml(class_names: dict[int, str]) -> tuple[Path, tempfile.NamedTemporaryFile]:
-    """Create a temporary data.yaml file from class_names dict for supervision package."""
+    """Create a temporary data.yaml file from class_names dict for supervision package.
+
+    Args:
+        class_names: Mapping from class id to class name.
+
+    Returns:
+        Tuple of (Path to temporary data.yaml, NamedTemporaryFile context).
+
+    """
     temp_yaml_context = tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False)
     # Convert dict[int, str] to list format expected by supervision
     max_class_id = max(class_names.keys()) if class_names else 0
